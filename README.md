@@ -16,7 +16,7 @@
 * [ Đồ án môn học](#doan)
 ## GIỚI THIỆU MÔN HỌC
 <a name="gioithieumonhoc"></a>
-* **Tên môn học**: Ngôn ngữ lập trình C#
+* **Tên môn học**: Lập trình Python cho máy học
 * **Mã môn học**: CS116
 * **Lớp học**: CS116.N11
 * **Ngày bắt đầu**: 06/09/2022
