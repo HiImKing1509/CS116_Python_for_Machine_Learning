@@ -130,7 +130,7 @@ st.markdown(
 
 # =============== Data Visualization ===============
 sns.pairplot(dataset)
-plt.savefig('pairlot')
+plt.savefig('./images/pairlot')
 # ==================================================
 
 button_visualization = st.button("Pairlot dataset")
