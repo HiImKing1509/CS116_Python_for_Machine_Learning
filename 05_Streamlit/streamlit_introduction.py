@@ -71,4 +71,3 @@ if uploaded_file is not None:
     with col2:
         st.header("Result filter 2")
         st.image(result2)
-    
