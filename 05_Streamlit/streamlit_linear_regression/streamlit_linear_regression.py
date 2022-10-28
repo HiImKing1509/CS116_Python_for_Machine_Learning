@@ -6,7 +6,7 @@ import streamlit as st
 import mpld3
 import streamlit.components.v1 as components
 from PIL import Image
-import cv2
+import time
 
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -19,8 +19,8 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
 
 # Style
-from streamlit_style import styles
-from streamlit_resources import is_loaded, icon_check_success
+from streamlit_style import styles, test_result
+from streamlit_resources import is_loaded, is_train, icon_check_success, image_header, icon_warning
 
 # ======================================================================================== Application
 
@@ -28,6 +28,7 @@ st.set_page_config(layout="wide")
 st.markdown(styles.streamlit_style, unsafe_allow_html=True)
 
 # ============================================ Header introduce ============================================
+st.image(image_header)
 st.markdown(
     """
         # Name: Huynh Viet Tuan Kiet
@@ -44,6 +45,13 @@ st.markdown(
 )
 uploaded_file = st.file_uploader("Upload dataset")
 if uploaded_file is not None:
+    st.markdown(
+        """
+            ### About this file
+        """
+    )
+    st.text("This dataset has data collected from New York, California and Florida about 50 business Startups "'17 in each state'". The variables used in the dataset are Profit, R&D spending, Administration Spending, and Marketing Spending.")
+    st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
     is_loaded = True
     bytes_data = uploaded_file.getvalue()
     img_path = './' + uploaded_file.name
@@ -71,8 +79,8 @@ if uploaded_file is not None:
     # with open(img_path, 'wb') as f:
     #     f.write(bytes_data)
     dataset_style = dataset.copy()
-    dataset_style = dataset_style.style.background_gradient(cmap='Purples_r')
-    st.dataframe(dataset, height=600, use_container_width=True)
+    dataset_style = dataset_style.style.background_gradient(cmap='Blues')
+    st.dataframe(dataset_style, height=600, use_container_width=True)
 
 # ============================================ Feature Selection ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
@@ -119,21 +127,21 @@ if uploaded_file is not None:
     st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
     
     train_features = data.iloc[:, features]
-    test_label = data.iloc[:, -1]
+    test_label = data.iloc[:, -1].to_frame()
     col1, col2, col3 = st.columns([7, 1, 2])
     with col1:
         col1.markdown(
                 """
                     ### Data train
                 """, unsafe_allow_html=True)
-        col1.dataframe(train_features, use_container_width=True)
+        col1.dataframe(train_features.style.background_gradient(cmap='Blues'), use_container_width=True)
     with col2: st.write(' ')
     with col3:
         col3.markdown(
                 """
                     ### Data test
                 """, unsafe_allow_html=True)
-        col3.dataframe(test_label, use_container_width=True)
+        col3.dataframe(test_label.style.background_gradient(cmap='Blues'), use_container_width=True)
         
     # ======================================================
 
@@ -170,12 +178,13 @@ if uploaded_file is not None:
             """
         )
         
+        st.text("For label encoding, we need to import LabelEncoder as shown below. Then we create an object of this class that is used to call fit_transform() method to encode the state column of the given datasets.")
         flag_encoder = False
         
         if 3 in features:
             lb = LabelEncoder()
             data['State'] = data['State'].astype('category').cat.codes
-            st.dataframe(data.iloc[:, features], use_container_width=True)
+            st.dataframe(data.iloc[:, features].style.background_gradient(cmap='Purples'), use_container_width=True)
             flag_encoder = True
 
         # ============================================ Model selection ============================================
@@ -197,14 +206,17 @@ if uploaded_file is not None:
             )
         with col2:
             if button_train_test_split == 'Train test split':
-                st.write('You selected train test split')
                 slider_train_test_split = st.slider('Training rate', 0.0, 0.99, 0.8)
                 st.markdown(f"Train size accounts for {slider_train_test_split * 100}% dataset")
                 input_random_state = st.number_input('Random state', min_value=0)
                 st.markdown(f"Random state equal {input_random_state}")
                 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=slider_train_test_split, random_state=input_random_state)
             else:
-                st.write("You selected K-Fold")
+                split_value = st.selectbox(
+                    'How many fold splitted',
+                    (2, 3, 4, 5, 6, 7, 8, 9, 10)
+                )
+                st.write('You selected:', split_value)
         
 
         # ============================================ Model ============================================
@@ -215,43 +227,171 @@ if uploaded_file is not None:
             """
         )
         st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
-        col1, col2 = st.columns([65, 35])
+        col1, col2, col3 = st.columns([5, 1, 4])
         # ==================== Model ==========================
         with col1:
-            model = LinearRegression()
-            hist = model.fit(X_train, y_train)
-            train_success = f"""
-                <style>
-                    p.uploaded_file {{
-                            color: Green;
-                            fon-size: 16px;
-                            font-weight: 900;
-                        }}
-                </style> 
-                <p class="uploaded_file">Model has been trained successfully</p>
-            """
-            st.image(icon_check_success, width=24)
-            st.markdown(train_success, unsafe_allow_html=True)
+            st.markdown(
+                """
+                    ### Train model
+                """
+            )
+            button_train = st.checkbox("Run")
+            if button_train:
+                model = None
+                if button_train_test_split == 'Train test split':
+                    my_bar = st.progress(0)
+                    model = LinearRegression()
+                    hist = model.fit(X_train, y_train)
+                    y_pred = model.predict(X_test)
+                    tt_mse = np.sqrt(mean_squared_error(y_test, y_pred))
+                    tt_r2_score = r2_score(y_test, y_pred) * 100
+                    tt_mae = mean_absolute_error(y_test, y_pred)
+                    for percent_complete in range(0, 100, 20):
+                        time.sleep(0.1)
+                        my_bar.progress(percent_complete + 20)
+                else:
+                    kf_r2_score = 0
+                    kf_mse = 0
+                    kf_mae = 0
+                    i = 0
+                    kf = KFold(n_splits = int(split_value))
+                    for train_index, test_index in kf.split(X):
+                        my_bar = st.progress(0)
+                        # Split data
+                        X_train, X_test = X[train_index], X[test_index]
+                        y_train, y_test = y[train_index], y[test_index]
+                        
+                        # k-fold train model
+                        model = LinearRegression()
+                        hist = model.fit(X_train, y_train)
+                        
+                        # k-fold test model
+                        y_pred = model.predict(X_test)
+                        
+                        # r2_score
+                        r2 = r2_score(y_test, y_pred)
+                        kf_r2_score += r2
+                        
+                        # mse score
+                        mse = np.sqrt(mean_squared_error(y_test, y_pred))
+                        kf_mse += mse
+                        
+                        # mae score
+                        mae = mean_absolute_error(y_test, y_pred)
+                        kf_mae += mae
+                        
+                        st.text(f"{i + 1} Fold successfully")
+                        
+                        for percent_complete in range(0, 100, 20):
+                            time.sleep(0.1)
+                            my_bar.progress(percent_complete + 20)
+                        
+                        i += 1
+                train_success = f"""
+                        <style>
+                            p.uploaded_file {{
+                                    color: Green;
+                                    fon-size: 16px;
+                                    font-weight: 900;
+                                }}
+                        </style> 
+                        <p class="uploaded_file">Model has been trained successfully</p>
+                    """
+                st.markdown(train_success, unsafe_allow_html=True)
         # ============================================ Model predicted ============================================
-        with col2:
-            y_pred = model.predict(X_test)
-            test_success = f"""
-                <style>
-                    p.uploaded_file {{
-                            color: Green;
-                            font-size: 16px;
-                            font-weight: 900;
-                        }}
-                </style> 
-                <p class="uploaded_file">Model has been trained successfully</p>
-            """
-            st.image(icon_check_success, width=24)
-            st.markdown(test_success, unsafe_allow_html=True)
+                with col2:
+                    st.write("")
+                with col3:
+                    st.markdown(
+                        """
+                            ### Result in test set
+                        """
+                    )
+                    if button_train_test_split == 'Train test split':
+                        st.write(test_result("Mean square error", tt_mse), unsafe_allow_html=True)
+                        st.write(test_result("R2 Score", tt_r2_score), unsafe_allow_html=True)
+                        st.write(test_result("Mean Absolute Error", tt_mae), unsafe_allow_html=True)
+                    else:
+                        st.write(test_result("Mean square error", kf_mse), unsafe_allow_html=True)
+                        st.write(test_result("R2 Score", kf_r2_score), unsafe_allow_html=True)
+                        st.write(test_result("Mean Absolute Error", kf_mae), unsafe_allow_html=True)
+                    test_success = f"""
+                        <style>
+                            p.uploaded_file {{
+                                    color: Green;
+                                    font-size: 16px;
+                                    font-weight: 900;
+                                }}
+                        </style> 
+                        <p class="uploaded_file">Model has been tested successfully</p>
+                    """
+                    st.markdown(test_success, unsafe_allow_html=True)
+                st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
+                st.markdown(
+                    """
+                        ### Predicted Values
+                    """
+                )
+                pred_df = pd.DataFrame({'Actual Value':y_test,'Predicted Value':y_pred,'Difference':y_test-y_pred})
+                st.dataframe(pred_df, use_container_width=True)
+                
+                st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
+                st.markdown(
+                    """
+                        ### Visualize predicted and actually values
+                    """
+                )
+                
 
-        # # Step 6: Testing model
+        # ============================================ Test on real data ============================================
+                st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+                st.markdown(
+                    """
+                        ## Test on real data
+                    """
+                )
+                
+                predict = []
+                if 0 in features:
+                    text_0 = st.text_input(f"Enter {data.columns[0]}", placeholder=data.columns[0])
+                if 1 in features:
+                    text_1 = st.text_input(f"Enter {data.columns[1]}", placeholder=data.columns[1])
+                if 2 in features:
+                    text_2 = st.text_input(f"Enter {data.columns[2]}", placeholder=data.columns[2])
+                if 3 in features:
+                    enter_state = st.selectbox(
+                        f'Enter {data.columns[3]}',
+                        ("None", "New York", "California", "Florida")
+                    )
+                
+                if 0 in features and text_0 != '':
+                    predict.append(text_0)
+                if 1 in features and text_1 != '':
+                    predict.append(text_1)
+                if 2 in features and text_2 != '':
+                    predict.append(text_2)
+                if 3 in features:
+                    if enter_state == "New York":
+                        predict.append(2)
+                    elif enter_state == "California":
+                        predict.append(0)
+                    elif enter_state == "Florida":
+                        predict.append(1)
+                relity_data = st.button("Run")
+                if relity_data:
+                    if len(predict) == len(features):
+                        predict_arr = np.array(predict)                    
+                        predict_arr = np.reshape(predict_arr, (1, -1))
+                        y_pred_real = model.predict(predict_arr)
+                        st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
+                    else:
+                        st.image(icon_warning, width=24)
+                        if 0 in features and text_0 == '':
+                            st.write("Enter value for R&D Spend")
+                        if 1 in features and text_1 == '':
+                            st.write("Enter value for Administration")
+                        if 2 in features and text_1 == '':
+                            st.write("Enter value for Marketing Spend")
+                        if 3 in features and enter_state == "None":
+                            st.write("Select value for State")
 
-        # print(np.sqrt(mean_squared_error(y_test, y_pred)))
-        # print(r2_score(y_test, y_pred) * 100)
-        # print(mean_absolute_error(y_test, y_pred))
-
-        # st.text_input("Result:", r2_score(y_test, y_pred) * 100)
