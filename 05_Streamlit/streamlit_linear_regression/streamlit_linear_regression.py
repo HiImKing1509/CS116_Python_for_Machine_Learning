@@ -428,7 +428,9 @@ if uploaded_file is not None:
                     st.dataframe(pred_df, use_container_width=True)
                 with tabV:
                     fig, ax = plt.subplots()
-                    plt.plot(y_test, y_pred, color='red')
+                    plt.scatter(y_test, y_pred)
+                    plt.xlabel('Actual')
+                    plt.ylabel('Predicted')
                     st.write(fig, unsafe_allow_html=True)
                     plt.close()
                 
