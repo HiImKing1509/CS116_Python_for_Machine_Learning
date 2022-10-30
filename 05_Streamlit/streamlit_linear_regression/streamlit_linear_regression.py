@@ -247,7 +247,7 @@ if uploaded_file is not None:
             arr_score_train_test_split = None
             df_train_test_split = None
             if button_train:
-                model = None 
+                model = None
                 if button_train_test_split == 'Train test split':
                     my_bar = st.progress(0)
                     model = LinearRegression()
@@ -461,7 +461,7 @@ if uploaded_file is not None:
                     if len(predict) == len(features):
                         predict_arr = np.array(predict)
                         predict_arr = np.reshape(predict_arr, (1, -1))
-                        st.write(1)
+                        st.write(predict_arr)
                         y_pred_real = model.predict(predict_arr)
                         st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
                     else:
