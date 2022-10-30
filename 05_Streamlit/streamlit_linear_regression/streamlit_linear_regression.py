@@ -147,13 +147,10 @@ if uploaded_file is not None:
     # =============== Data Visualization ===============
     
     # -----
-    sns.pairplot(dataset)
-    plt.savefig('./images/pairlot')
-    plt.close()
     
     # -----
     sns.heatmap(data.corr(), annot=True, cmap='Blues')
-    plt.savefig('./images/headmap')
+    # plt.savefig('./images/headmap')
     plt.close()
 
     # ----
@@ -177,8 +174,8 @@ if uploaded_file is not None:
         st.write(' ')
     with col3: 
         if button_visualization == "Pairlot dataset":
-            image = Image.open('./images/pairlot.png')
-            st.image(image, caption='Visualize pairlot dataset', use_column_width=True)
+            fig = sns.pairplot(dataset)
+            st.pyplot(fig, caption='Visualize pairlot dataset', use_column_width=True)
         elif button_visualization == "Heatmap dataset":
             image = Image.open('./images/headmap.png')
             st.image(image, caption='Visualize headmap dataset', use_column_width=True)
