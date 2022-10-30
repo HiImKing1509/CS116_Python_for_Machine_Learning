@@ -422,8 +422,16 @@ if uploaded_file is not None:
                         ### Predicted Values
                     """
                 )
-                pred_df = pd.DataFrame({'Actual Value':y_test,'Predicted Value':y_pred,'Difference':y_test-y_pred})
-                st.dataframe(pred_df, use_container_width=True)
+                tabS, tabV = st.tabs(["Statistical", "Visualization"])
+                with tabS:
+                    pred_df = pd.DataFrame({'Actual Value':y_test,'Predicted Value':y_pred,'Difference':y_test-y_pred})
+                    st.dataframe(pred_df, use_container_width=True)
+                with tabV:
+                    fig, ax = plt.subplots()
+                    sns.regplot(x=y_test, y=y_pred, ci=None, color='red')
+                    st.write(fig, unsafe_allow_html=True)
+                    plt.close()
+                
                 
         # ============================================ Test on real data ============================================
                 st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
