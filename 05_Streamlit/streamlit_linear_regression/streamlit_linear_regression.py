@@ -159,18 +159,20 @@ if uploaded_file is not None:
             st.pyplot(fig, caption='Visualize pairlot dataset', use_column_width=True)
             plt.close()
         elif button_visualization == "Heatmap dataset":
-            fig = sns.heatmap(data.corr(), annot=True, cmap='Blues')
-            st.pyplot(fig, caption='Visualize headmap dataset', use_column_width=True)
+            fig, ax = plt.subplots()
+            sns.heatmap(data.corr(), annot=True, cmap='Blues')
+            st.write(fig, unsafe_allow_html=True)
             plt.close()
         else:
+            fig, ax = plt.subplots()
             outliers = ['Profit']
             plt.rcParams['figure.figsize'] = [8,8]
-            fig = sns.boxplot(data=dataset[outliers], orient="v", palette="Set2" , width=0.7) # orient = "v" : vertical boxplot , 
-                                                                                        # orient = "h" : hotrizontal boxplot
+            sns.boxplot(data=dataset[outliers], orient="v", palette="Set2" , width=0.7)
+            
             plt.title("Outliers Variable Distribution")
             plt.ylabel("Profit Range")
             plt.xlabel("Continuous Variable")
-            st.pyplot(fig, caption='Visualize outliers detection in the target variable', use_column_width=True)
+            st.write(fig, unsafe_allow_html=True)
             plt.close()
 
     # ============================================ Data preprocessing ============================================
