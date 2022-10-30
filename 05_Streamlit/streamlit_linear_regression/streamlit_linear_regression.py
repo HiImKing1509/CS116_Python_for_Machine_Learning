@@ -428,7 +428,7 @@ if uploaded_file is not None:
                     st.dataframe(pred_df, use_container_width=True)
                 with tabV:
                     fig, ax = plt.subplots()
-                    sns.regplot(x=y_test, y=y_pred, ci=None, color='red')
+                    plt.plot(y_test, y_pred, color='red')
                     st.write(fig, unsafe_allow_html=True)
                     plt.close()
                 
