@@ -64,7 +64,7 @@ if uploaded_file is not None:
     """
     
     # =============== Read data ==============
-    data = pd.read_csv(uploaded_file.name)
+    data = pd.read_csv(uploaded_file)
     dataset = data.copy()
     # ========================================
     
