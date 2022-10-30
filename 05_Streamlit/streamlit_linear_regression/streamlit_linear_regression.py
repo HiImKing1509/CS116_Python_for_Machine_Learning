@@ -2,16 +2,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import show, plot
 import streamlit as st
-import mpld3
-import streamlit.components.v1 as components
 from PIL import Image
-from statistics import mean
 import time
 
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split, KFold
 import seaborn as sns
 
@@ -22,7 +18,7 @@ from sklearn.metrics import mean_absolute_error
 
 # Style
 from streamlit_style import styles, test_result
-from streamlit_resources import is_loaded, is_train, icon_check_success, image_header, icon_warning, plot_kfold
+from streamlit_resources import icon_check_success, image_header, icon_warning, plot_kfold
 
 # ======================================================================================== Application
 
@@ -73,9 +69,7 @@ if uploaded_file is not None:
     dataset = data.copy()
     # ========================================
     
-    col1, col2 = st.columns([1, 30])
-    col1.image(icon_check_success, width=24)
-    col2.markdown(text_load_dataset_success, unsafe_allow_html=True)
+    st.markdown(text_load_dataset_success, unsafe_allow_html=True)
     dataset_style = dataset.copy()
     dataset_style = dataset_style.style.background_gradient(cmap='Blues')
     st.dataframe(dataset_style, height=600, use_container_width=True)
