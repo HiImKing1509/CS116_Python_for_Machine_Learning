@@ -431,6 +431,8 @@ if uploaded_file is not None:
                     plt.scatter(y_test, y_pred)
                     plt.xlabel('Actual')
                     plt.ylabel('Predicted')
+                    m, b = np.polyfit(y_test, y_pred, 1)
+                    plt.plot(y_test, m* y_test + b)
                     st.write(fig, unsafe_allow_html=True)
                     plt.close()
                 
