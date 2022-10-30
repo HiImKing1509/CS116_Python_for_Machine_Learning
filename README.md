@@ -14,6 +14,7 @@
 * [ Giảng viên hướng dẫn](#giangvien)
 * [ Thành viên](#thanhvien)
 * [ Đồ án môn học](#doan)
+
 ## GIỚI THIỆU MÔN HỌC
 <a name="gioithieumonhoc"></a>
 * **Tên môn học**: Lập trình Python cho máy học
@@ -32,5 +33,8 @@
 | ------ |:-------------:| ----------------------:|-----------------------------------------------------:|-------------------------:
 | 1      | 20521494      | Huỳnh Viết Tuấn Kiệt |[hiimking1509](https://github.com/HiImKing1509)          |20521494@gm.uit.edu.vn   |
 
-## 
+## BÀI TẬP
+1. <a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">Streamlit app</a>
+
+## ĐỒ ÁN
 <a name="doan"></a>
