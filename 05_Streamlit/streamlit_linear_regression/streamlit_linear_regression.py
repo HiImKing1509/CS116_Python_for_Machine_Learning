@@ -462,6 +462,7 @@ if uploaded_file is not None:
                         predict_arr = np.array(predict)
                         predict_arr = np.reshape(predict_arr, (1, -1))
                         st.write(predict_arr)
+                        st.write(type(predict_arr))
                         y_pred_real = model.predict(predict_arr)
                         st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
                     else:
