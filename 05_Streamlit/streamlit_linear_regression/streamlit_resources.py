@@ -29,4 +29,3 @@ def plot_kfold(metric_arr, fold, color):
         
     plt.legend()
     plt.close()
-    return fig

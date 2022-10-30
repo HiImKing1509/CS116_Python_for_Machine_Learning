@@ -353,13 +353,52 @@ if uploaded_file is not None:
                         tab1, tab2, tab3 = st.tabs(["MSE", "R2 Score", "MAE"])
                         with tab1:
                             st.header("MSE")
-                            st.pyplot(plot_kfold(kf_mse_arr, fold, 'r'))
+                            barWidth = 0.5
+                            fig = plt.subplots(figsize =(12, 8))
+                            metric = kf_mse_arr
+                            br1 = np.arange(len(metric))
+                            plt.bar(br1, metric, color = 'r', width = barWidth, edgecolor ='grey', label ='metric')
+                            plt.xlabel('Fold', fontweight ='bold', fontsize = 16)
+                            plt.ylabel('Score', fontweight ='bold', fontsize = 16)
+                            plt.xticks(
+                                        [r for r in range(len(metric))],
+                                        fold
+                                )                                
+                            plt.legend()
+                            st.pyplot(caption='MSE', use_column_width=True)
+                            plt.close()
                         with tab2:
                             st.header("R2 Score")
-                            st.pyplot(plot_kfold(kf_r2_arr, fold, 'b'))
+                            barWidth = 0.5
+                            fig = plt.subplots(figsize =(12, 8))
+                            metric = kf_r2_arr
+                            br1 = np.arange(len(metric))
+                            plt.bar(br1, metric, color = 'b', width = barWidth, edgecolor ='grey', label ='metric')
+                            plt.xlabel('Fold', fontweight ='bold', fontsize = 16)
+                            plt.ylabel('Score', fontweight ='bold', fontsize = 16)
+                            plt.xticks(
+                                        [r for r in range(len(metric))],
+                                        fold
+                                )                                
+                            plt.legend()
+                            st.pyplot(fig, caption='R2 Score', use_column_width=True)
+                            plt.close()
                         with tab3:
                             st.header("MAE")
-                            st.pyplot(plot_kfold(kf_mae_arr, fold, 'g'))
+                            barWidth = 0.5
+                            fig = plt.subplots(figsize =(12, 8))
+                            metric = kf_mae_arr
+                            br1 = np.arange(len(metric))
+                            plt.bar(br1, metric, color = 'g', width = barWidth, edgecolor ='grey', label ='metric')
+                            plt.xlabel('Fold', fontweight ='bold', fontsize = 16)
+                            plt.ylabel('Score', fontweight ='bold', fontsize = 16)
+                            plt.xticks(
+                                        [r for r in range(len(metric))],
+                                        fold
+                                )                                
+                            plt.legend()
+                            st.pyplot(fig, caption='R2 Score', use_column_width=True)
+                            plt.close()
 
 
                 st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
