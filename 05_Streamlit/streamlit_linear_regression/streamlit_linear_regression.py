@@ -433,6 +433,8 @@ if uploaded_file is not None:
                     plt.ylabel('Predicted')
                     st.write(type(y_test))
                     st.write(type(y_pred))
+                    st.write(y_test)
+                    st.write(y_pred)
                     st.write(type(y_test[0]))
                     st.write(type(y_pred[0]))
                     m, b = np.polyfit(y_test, y_pred, 1)
