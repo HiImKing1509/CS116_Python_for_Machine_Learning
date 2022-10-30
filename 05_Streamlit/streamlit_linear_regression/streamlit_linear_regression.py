@@ -410,14 +410,6 @@ if uploaded_file is not None:
                 pred_df = pd.DataFrame({'Actual Value':y_test,'Predicted Value':y_pred,'Difference':y_test-y_pred})
                 st.dataframe(pred_df, use_container_width=True)
                 
-                st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
-                st.markdown(
-                    """
-                        ### Visualize predicted and actually values
-                    """
-                )
-                
-
         # ============================================ Test on real data ============================================
                 st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
                 st.markdown(
