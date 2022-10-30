@@ -6,7 +6,6 @@ is_loaded = False
 is_train = False
 
 def plot_kfold(metric_arr, fold, color):
-    
     # set width of bar
     barWidth = 0.5
     fig = plt.subplots(figsize =(12, 8))
@@ -30,3 +29,4 @@ def plot_kfold(metric_arr, fold, color):
         
     plt.legend()
     plt.close()
+    return fig
