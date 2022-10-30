@@ -354,7 +354,7 @@ if uploaded_file is not None:
                         with tab1:
                             st.header("MSE")
                             barWidth = 0.5
-                            fig = plt.subplots(figsize =(12, 8))
+                            fig, ax = plt.subplots(figsize =(12, 8))
                             metric = kf_mse_arr
                             br1 = np.arange(len(metric))
                             plt.bar(br1, metric, color = 'r', width = barWidth, edgecolor ='grey', label ='metric')
@@ -365,12 +365,12 @@ if uploaded_file is not None:
                                         fold
                                 )                                
                             plt.legend()
-                            st.pyplot(caption='MSE', use_column_width=True)
+                            st.pyplot(fig, caption='MSE', use_column_width=True)
                             plt.close()
                         with tab2:
                             st.header("R2 Score")
                             barWidth = 0.5
-                            fig = plt.subplots(figsize =(12, 8))
+                            fig, ax = plt.subplots(figsize =(12, 8))
                             metric = kf_r2_arr
                             br1 = np.arange(len(metric))
                             plt.bar(br1, metric, color = 'b', width = barWidth, edgecolor ='grey', label ='metric')
@@ -386,7 +386,7 @@ if uploaded_file is not None:
                         with tab3:
                             st.header("MAE")
                             barWidth = 0.5
-                            fig = plt.subplots(figsize =(12, 8))
+                            fig, ax = plt.subplots(figsize =(12, 8))
                             metric = kf_mae_arr
                             br1 = np.arange(len(metric))
                             plt.bar(br1, metric, color = 'g', width = barWidth, edgecolor ='grey', label ='metric')
@@ -397,7 +397,7 @@ if uploaded_file is not None:
                                         fold
                                 )                                
                             plt.legend()
-                            st.pyplot(fig, caption='R2 Score', use_column_width=True)
+                            st.pyplot(fig, caption='MAE', use_column_width=True)
                             plt.close()
 
 
