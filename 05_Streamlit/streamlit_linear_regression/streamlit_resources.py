@@ -5,7 +5,7 @@ from PIL import Image
 is_loaded = False
 is_train = False
 
-def plot_kfold(metric_arr, fold, color, filename):
+def plot_kfold(metric_arr, fold, color):
     
     # set width of bar
     barWidth = 0.5
@@ -29,5 +29,4 @@ def plot_kfold(metric_arr, fold, color, filename):
         )
         
     plt.legend()
-    plt.savefig(filename)
     plt.close()

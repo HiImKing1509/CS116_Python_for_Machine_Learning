@@ -349,26 +349,17 @@ if uploaded_file is not None:
                         st.write(test_result("Mean square error", final_kf_mse), unsafe_allow_html=True)
                         st.write(test_result("R2 Score", final_kf_r2_score), unsafe_allow_html=True)
                         st.write(test_result("Mean Absolute Error", final_kf_mae), unsafe_allow_html=True)
-                        filename_kf_mse = './images/bar_k_fold_mse.png'
-                        filename_kf_r2 = './images/bar_k_fold_r2.png'
-                        filename_kf_mae = './images/bar_k_fold_mae.png'
-                        plot_kfold(kf_mse_arr, fold, 'r' ,filename_kf_mse)
-                        plot_kfold(kf_r2_arr, fold, 'b', filename_kf_r2)
-                        plot_kfold(kf_mae_arr, fold, 'g', filename_kf_mae)
                         
                         tab1, tab2, tab3 = st.tabs(["MSE", "R2 Score", "MAE"])
-                        bar_k_fold_mse = Image.open(filename_kf_mse)
-                        bar_k_fold_r2 = Image.open(filename_kf_r2)
-                        bar_k_fold_mae = Image.open(filename_kf_mae)
                         with tab1:
                             st.header("MSE")
-                            st.image(bar_k_fold_mse)
+                            st.pyplot(plot_kfold(kf_mse_arr, fold, 'r'))
                         with tab2:
                             st.header("R2 Score")
-                            st.image(bar_k_fold_r2)
+                            st.pyplot(plot_kfold(kf_r2_arr, fold, 'b'))
                         with tab3:
                             st.header("MAE")
-                            st.image(bar_k_fold_mae)
+                            st.pyplot(plot_kfold(kf_mae_arr, fold, 'g'))
 
 
                 st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
