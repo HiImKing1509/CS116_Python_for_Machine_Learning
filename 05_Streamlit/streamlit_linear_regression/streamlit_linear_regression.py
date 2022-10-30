@@ -2,10 +2,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import show, plot
 import streamlit as st
 import mpld3
 import streamlit.components.v1 as components
 from PIL import Image
+from statistics import mean
 import time
 
 from sklearn.linear_model import LinearRegression
@@ -20,7 +22,7 @@ from sklearn.metrics import mean_absolute_error
 
 # Style
 from streamlit_style import styles, test_result
-from streamlit_resources import is_loaded, is_train, icon_check_success, image_header, icon_warning
+from streamlit_resources import is_loaded, is_train, icon_check_success, image_header, icon_warning, plot_kfold
 
 # ======================================================================================== Application
 
@@ -74,10 +76,6 @@ if uploaded_file is not None:
     col1, col2 = st.columns([1, 30])
     col1.image(icon_check_success, width=24)
     col2.markdown(text_load_dataset_success, unsafe_allow_html=True)
-    # st.text(uploaded_file.name + ' is loaded')
-    # st.write(bytes_data)
-    # with open(img_path, 'wb') as f:
-    #     f.write(bytes_data)
     dataset_style = dataset.copy()
     dataset_style = dataset_style.style.background_gradient(cmap='Blues')
     st.dataframe(dataset_style, height=600, use_container_width=True)
@@ -154,18 +152,46 @@ if uploaded_file is not None:
     )
 
     # =============== Data Visualization ===============
+    
+    # -----
     sns.pairplot(dataset)
     plt.savefig('./images/pairlot')
+    plt.close()
+    
+    # -----
+    sns.heatmap(data.corr(), annot=True, cmap='Blues')
+    plt.savefig('./images/headmap')
+    plt.close()
+
+    # ----
+    outliers = ['Profit']
+    plt.rcParams['figure.figsize'] = [8,8]
+    sns.boxplot(data=dataset[outliers], orient="v", palette="Set2" , width=0.7) # orient = "v" : vertical boxplot , 
+                                                                                # orient = "h" : hotrizontal boxplot
+    plt.title("Outliers Variable Distribution")
+    plt.ylabel("Profit Range")
+    plt.xlabel("Continuous Variable")
+    plt.savefig('./images/outliers')
+    plt.close()
     # ==================================================
-
-    button_visualization = st.button("Pairlot dataset")
-
-    if button_visualization:
-        image_pairlot = Image.open('./images/pairlot.png')
-        col1, col2, col3 = st.columns([1,6,1])
-        with col1: st.write(' ')
-        with col2: st.image(image_pairlot, caption='Visualize pairlot dataset')
-        with col3: st.write(' ')
+    col1, col2, col3 = st.columns([3, 1, 6])
+    with col1: 
+        button_visualization = st.selectbox(
+            "",
+            ('Pairlot dataset', 'Heatmap dataset', 'Outliers detection in the target variable')
+        )
+    with col2:
+        st.write(' ')
+    with col3: 
+        if button_visualization == "Pairlot dataset":
+            image = Image.open('./images/pairlot.png')
+            st.image(image, caption='Visualize pairlot dataset', use_column_width=True)
+        elif button_visualization == "Heatmap dataset":
+            image = Image.open('./images/headmap.png')
+            st.image(image, caption='Visualize headmap dataset', use_column_width=True)
+        else:
+            image = Image.open('./images/outliers.png')
+            st.image(image, caption='Visualize outliers detection in the target variable', use_column_width=True)
 
     # ============================================ Data preprocessing ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
@@ -227,7 +253,7 @@ if uploaded_file is not None:
             """
         )
         st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([5, 1, 4])
+        col1, col2, col3 = st.columns([4, 1, 5])
         # ==================== Model ==========================
         with col1:
             st.markdown(
@@ -236,8 +262,10 @@ if uploaded_file is not None:
                 """
             )
             button_train = st.checkbox("Run")
+            arr_score_train_test_split = None
+            df_train_test_split = None
             if button_train:
-                model = None
+                model = None 
                 if button_train_test_split == 'Train test split':
                     my_bar = st.progress(0)
                     model = LinearRegression()
@@ -254,7 +282,14 @@ if uploaded_file is not None:
                     kf_mse = 0
                     kf_mae = 0
                     i = 0
+                    
+                    kf_r2_arr = []
+                    kf_mse_arr = []
+                    kf_mae_arr = []
+                    fold = []
+                    
                     kf = KFold(n_splits = int(split_value))
+                    print(type(X))
                     for train_index, test_index in kf.split(X):
                         my_bar = st.progress(0)
                         # Split data
@@ -270,15 +305,15 @@ if uploaded_file is not None:
                         
                         # r2_score
                         r2 = r2_score(y_test, y_pred)
-                        kf_r2_score += r2
+                        kf_r2_arr.append(r2)
                         
                         # mse score
                         mse = np.sqrt(mean_squared_error(y_test, y_pred))
-                        kf_mse += mse
+                        kf_mse_arr.append(mse)
                         
                         # mae score
                         mae = mean_absolute_error(y_test, y_pred)
-                        kf_mae += mae
+                        kf_mae_arr.append(mae)
                         
                         st.text(f"{i + 1} Fold successfully")
                         
@@ -286,6 +321,7 @@ if uploaded_file is not None:
                             time.sleep(0.1)
                             my_bar.progress(percent_complete + 20)
                         
+                        fold.append(f"Fold {i}")
                         i += 1
                 train_success = f"""
                         <style>
@@ -307,25 +343,52 @@ if uploaded_file is not None:
                             ### Result in test set
                         """
                     )
+                    
+                    test_success = f"""
+                            <style>
+                                p.uploaded_file {{
+                                        color: Green;
+                                        font-size: 16px;
+                                        font-weight: 900;
+                                    }}
+                            </style> 
+                            <p class="uploaded_file">Model has been tested successfully</p>
+                        """
+                    st.markdown(test_success, unsafe_allow_html=True)
+                        
                     if button_train_test_split == 'Train test split':
                         st.write(test_result("Mean square error", tt_mse), unsafe_allow_html=True)
                         st.write(test_result("R2 Score", tt_r2_score), unsafe_allow_html=True)
                         st.write(test_result("Mean Absolute Error", tt_mae), unsafe_allow_html=True)
                     else:
-                        st.write(test_result("Mean square error", kf_mse), unsafe_allow_html=True)
-                        st.write(test_result("R2 Score", kf_r2_score), unsafe_allow_html=True)
-                        st.write(test_result("Mean Absolute Error", kf_mae), unsafe_allow_html=True)
-                    test_success = f"""
-                        <style>
-                            p.uploaded_file {{
-                                    color: Green;
-                                    font-size: 16px;
-                                    font-weight: 900;
-                                }}
-                        </style> 
-                        <p class="uploaded_file">Model has been tested successfully</p>
-                    """
-                    st.markdown(test_success, unsafe_allow_html=True)
+                        final_kf_mse = sum(kf_mse_arr) / len(kf_mse_arr)
+                        final_kf_r2_score = sum(kf_r2_arr) / len(kf_r2_arr)
+                        final_kf_mae = sum(kf_mae_arr) / len(kf_mae_arr)
+                        st.write(test_result("Mean square error", final_kf_mse), unsafe_allow_html=True)
+                        st.write(test_result("R2 Score", final_kf_r2_score), unsafe_allow_html=True)
+                        st.write(test_result("Mean Absolute Error", final_kf_mae), unsafe_allow_html=True)
+                        filename_kf_mse = './images/bar_k_fold_mse.png'
+                        filename_kf_r2 = './images/bar_k_fold_r2.png'
+                        filename_kf_mae = './images/bar_k_fold_mae.png'
+                        plot_kfold(kf_mse_arr, fold, 'r' ,filename_kf_mse)
+                        plot_kfold(kf_r2_arr, fold, 'b', filename_kf_r2)
+                        plot_kfold(kf_mae_arr, fold, 'g', filename_kf_mae)
+                        
+                        tab1, tab2, tab3 = st.tabs(["MSE", "R2 Score", "MAE"])
+                        bar_k_fold_mse = Image.open(filename_kf_mse)
+                        bar_k_fold_r2 = Image.open(filename_kf_r2)
+                        bar_k_fold_mae = Image.open(filename_kf_mae)
+                        with tab1:
+                            st.header("MSE")
+                            st.image(bar_k_fold_mse)
+                        with tab2:
+                            st.header("R2 Score")
+                            st.image(bar_k_fold_r2)
+                        with tab3:
+                            st.header("MAE")
+                            st.image(bar_k_fold_mae)
+
+
                 st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
                 st.markdown(
                     """
@@ -350,6 +413,10 @@ if uploaded_file is not None:
                         ## Test on real data
                     """
                 )
+                
+                text_0 = ''
+                text_1 = ''
+                text_2 = ''
                 
                 predict = []
                 if 0 in features:
