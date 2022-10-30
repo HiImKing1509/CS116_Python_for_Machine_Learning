@@ -18,7 +18,7 @@ from sklearn.metrics import mean_absolute_error
 
 # Style
 from streamlit_style import styles, test_result
-from streamlit_resources import icon_check_success, image_header, icon_warning, plot_kfold
+from streamlit_resources import plot_kfold
 
 # ======================================================================================== Application
 
@@ -26,7 +26,6 @@ st.set_page_config(layout="wide")
 st.markdown(styles.streamlit_style, unsafe_allow_html=True)
 
 # ============================================ Header introduce ============================================
-st.image(image_header)
 st.markdown(
     """
         # Name: Huynh Viet Tuan Kiet
@@ -446,7 +445,6 @@ if uploaded_file is not None:
                         y_pred_real = model.predict(predict_arr)
                         st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
                     else:
-                        st.image(icon_warning, width=24)
                         if 0 in features and text_0 == '':
                             st.write("Enter value for R&D Spend")
                         if 1 in features and text_1 == '':
