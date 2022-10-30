@@ -430,18 +430,7 @@ if uploaded_file is not None:
                     fig, ax = plt.subplots()
                     y_test_ = np.asarray(y_test, dtype=float)
                     y_pred_ = np.asarray(y_pred, dtype=float)
-
-                    plt.scatter(y_test_, y_pred_)
-                    plt.xlabel('Actual')
-                    plt.ylabel('Predicted')
-                    st.write(type(y_test))
-                    st.write(type(y_pred))
-                    st.write(y_test)
-                    st.write(y_pred)
-                    st.write(type(y_test[0]))
-                    st.write(type(y_pred[0]))
-                    m, b = np.polyfit(y_test_, y_pred_, 1)
-                    plt.plot(y_test_, m* y_test_ + b)
+                    sns.regplot(x=y_test_, y=y_pred_, ci=None, color ='red');
                     st.write(fig, unsafe_allow_html=True)
                     plt.close()
                 
