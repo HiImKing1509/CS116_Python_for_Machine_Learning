@@ -160,11 +160,13 @@ if uploaded_file is not None:
             st.pyplot(fig, caption='Visualize pairlot dataset', use_column_width=True)
             plt.close()
         elif button_visualization == "Heatmap dataset":
+            col1.header("Heatmap dataset")
             fig, ax = plt.subplots()
             sns.heatmap(data.corr(), annot=True, cmap='Blues')
             st.write(fig, unsafe_allow_html=True)
             plt.close()
         elif button_visualization == "Outliers detection in the target variable":
+            col1.header("Outliers detection in the target variable")
             fig, ax = plt.subplots()
             outliers = ['Profit']
             plt.rcParams['figure.figsize'] = [8,8]
@@ -176,11 +178,13 @@ if uploaded_file is not None:
             st.write(fig, unsafe_allow_html=True)
             plt.close()
         elif button_visualization == "State-wise outliers detection":
+            col1.header("State-wise outliers detection")
             fig, ax = plt.subplots()
             sns.boxplot(x = 'State', y = 'Profit', data = dataset)
             st.write(fig, unsafe_allow_html=True)
             plt.close()
         else:
+            col1.header("Histogram on Profit")
             fig, ax = plt.subplots()
             sns.distplot(dataset['Profit'],bins=5,kde=True)
             st.write(fig, unsafe_allow_html=True)
