@@ -428,7 +428,10 @@ if uploaded_file is not None:
                     st.dataframe(pred_df, use_container_width=True)
                 with tabV:
                     fig, ax = plt.subplots()
-                    plt.scatter(y_test, y_pred)
+                    y_test_ = np.asarray(y_test, dtype=float)
+                    y_pred_ = np.asarray(y_pred, dtype=float)
+
+                    plt.scatter(y_test_, y_pred_)
                     plt.xlabel('Actual')
                     plt.ylabel('Predicted')
                     st.write(type(y_test))
@@ -437,8 +440,8 @@ if uploaded_file is not None:
                     st.write(y_pred)
                     st.write(type(y_test[0]))
                     st.write(type(y_pred[0]))
-                    m, b = np.polyfit(y_test, y_pred, 1)
-                    plt.plot(y_test, m* y_test + b)
+                    m, b = np.polyfit(y_test_, y_pred_, 1)
+                    plt.plot(y_test_, m* y_test_ + b)
                     st.write(fig, unsafe_allow_html=True)
                     plt.close()
                 
