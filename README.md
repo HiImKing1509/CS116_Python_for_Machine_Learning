@@ -34,10 +34,10 @@
 | 1      | 20521494      | Huỳnh Viết Tuấn Kiệt |[hiimking1509](https://github.com/HiImKing1509)          |20521494@gm.uit.edu.vn   |
 
 ## BÀI TẬP
-<a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">1. Linear Regression</a>
-<a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">2. GIS Data Processing</a>
-<a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">3. Plotting polygons with Folium</a>
-<a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">4. Clustering user click data</a>
+<a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/01_Linear_Regression" style="border: 5; margin-left: 10;">1. Linear Regression</a>
+<a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/02_GIS_Data_Processing" style="border: 5; margin-left: 10;">2. GIS Data Processing</a>
+<a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/03_Plotting_polygons_with_Folium" style="border: 5; margin-left: 10;">3. Plotting polygons with Folium</a>
+<a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/04_%20Clustering_user_click_data" style="border: 5; margin-left: 10;">4. Clustering user click data</a>
 <a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">5. Streamlit app (Data processing and training model)</a>
 
 ## ĐỒ ÁN
