@@ -14,6 +14,12 @@
 * [ Giảng viên hướng dẫn](#giangvien)
 * [ Thành viên](#thanhvien)
 * [ Đồ án môn học](#doan)
+
+## BÀI TẬP
+<ol>
+  </li><a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">Streamlit app</a></li>
+</ol>
+
 ## GIỚI THIỆU MÔN HỌC
 <a name="gioithieumonhoc"></a>
 * **Tên môn học**: Lập trình Python cho máy học
