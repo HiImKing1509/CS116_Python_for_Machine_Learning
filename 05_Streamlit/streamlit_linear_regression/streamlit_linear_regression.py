@@ -145,22 +145,6 @@ if uploaded_file is not None:
     )
 
     # =============== Data Visualization ===============
-    
-    # -----
-    
-    # -----
-
-    # ----
-    outliers = ['Profit']
-    plt.rcParams['figure.figsize'] = [8,8]
-    sns.boxplot(data=dataset[outliers], orient="v", palette="Set2" , width=0.7) # orient = "v" : vertical boxplot , 
-                                                                                # orient = "h" : hotrizontal boxplot
-    plt.title("Outliers Variable Distribution")
-    plt.ylabel("Profit Range")
-    plt.xlabel("Continuous Variable")
-    plt.savefig('./images/outliers')
-    plt.close()
-    # ==================================================
     col1, col2, col3 = st.columns([3, 1, 6])
     with col1: 
         button_visualization = st.selectbox(
