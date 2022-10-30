@@ -149,7 +149,7 @@ if uploaded_file is not None:
     with col1: 
         button_visualization = st.selectbox(
             "",
-            ('Pairlot dataset', 'Heatmap dataset', 'Outliers detection in the target variable')
+            ('Pairlot dataset', 'Heatmap dataset', 'Outliers detection in the target variable', 'State-wise outliers detection', 'Histogram on Profit')
         )
     with col2:
         st.write(' ')
@@ -163,7 +163,7 @@ if uploaded_file is not None:
             sns.heatmap(data.corr(), annot=True, cmap='Blues')
             st.write(fig, unsafe_allow_html=True)
             plt.close()
-        else:
+        elif button_visualization == "Outliers detection in the target variable":
             fig, ax = plt.subplots()
             outliers = ['Profit']
             plt.rcParams['figure.figsize'] = [8,8]
@@ -172,6 +172,16 @@ if uploaded_file is not None:
             plt.title("Outliers Variable Distribution")
             plt.ylabel("Profit Range")
             plt.xlabel("Continuous Variable")
+            st.write(fig, unsafe_allow_html=True)
+            plt.close()
+        elif button_visualization == "State-wise outliers detection":
+            fig, ax = plt.subplots()
+            sns.boxplot(x = 'State', y = 'Profit', data = dataset)
+            st.write(fig, unsafe_allow_html=True)
+            plt.close()
+        else:
+            fig, ax = plt.subplots()
+            sns.distplot(dataset['Profit'],bins=5,kde=True)
             st.write(fig, unsafe_allow_html=True)
             plt.close()
 
