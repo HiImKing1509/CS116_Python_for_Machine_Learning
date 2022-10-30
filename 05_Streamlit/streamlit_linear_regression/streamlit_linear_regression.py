@@ -459,8 +459,9 @@ if uploaded_file is not None:
                 relity_data = st.button("Run")
                 if relity_data:
                     if len(predict) == len(features):
-                        predict_arr = np.array(predict)                    
+                        predict_arr = np.array(predict)
                         predict_arr = np.reshape(predict_arr, (1, -1))
+                        st.write(1)
                         y_pred_real = model.predict(predict_arr)
                         st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
                     else:
@@ -468,7 +469,7 @@ if uploaded_file is not None:
                             st.write("Enter value for R&D Spend")
                         if 1 in features and text_1 == '':
                             st.write("Enter value for Administration")
-                        if 2 in features and text_1 == '':
+                        if 2 in features and text_2 == '':
                             st.write("Enter value for Marketing Spend")
                         if 3 in features and enter_state == "None":
                             st.write("Select value for State")
