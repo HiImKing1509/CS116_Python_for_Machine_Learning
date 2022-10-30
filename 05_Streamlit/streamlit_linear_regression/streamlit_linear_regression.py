@@ -155,6 +155,7 @@ if uploaded_file is not None:
         st.write(' ')
     with col3: 
         if button_visualization == "Pairlot dataset":
+            col1.header("Pairlot dataset")
             fig = sns.pairplot(dataset)
             st.pyplot(fig, caption='Visualize pairlot dataset', use_column_width=True)
             plt.close()
