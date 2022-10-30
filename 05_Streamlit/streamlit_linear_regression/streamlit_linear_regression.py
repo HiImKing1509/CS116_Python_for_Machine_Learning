@@ -461,10 +461,11 @@ if uploaded_file is not None:
                     if len(predict) == len(features):
                         predict_arr = np.array(predict)
                         predict_arr = np.reshape(predict_arr, (1, -1))
-                        predict_arr = [int(i) for i in predict_arr]
-                        print(predict_arr)
-                        print(type(predict_arr[0]))
-                        y_pred_real = model.predict(predict_arr)
+                        predict_arr_ = np.asarray(predict_arr, dtype=float)
+                        print(predict_arr_)
+                        print(type(predict_arr_))
+                        print(type(predict_arr_[0]))
+                        y_pred_real = model.predict(predict_arr_)
                         st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
                     else:
                         if 0 in features and text_0 == '':
