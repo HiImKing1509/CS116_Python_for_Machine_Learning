@@ -286,7 +286,6 @@ if uploaded_file is not None:
                     fold = []
                     
                     kf = KFold(n_splits = int(split_value))
-                    print(type(X))
                     for train_index, test_index in kf.split(X):
                         my_bar = st.progress(0)
                         # Split data
