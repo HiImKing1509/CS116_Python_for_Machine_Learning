@@ -432,11 +432,11 @@ if uploaded_file is not None:
                 
                 predict = []
                 if 0 in features:
-                    text_0 = st.text_input(f"Enter {data.columns[0]}", placeholder=data.columns[0])
+                    text_0 = st.number_input(f"Enter {data.columns[0]}", placeholder=data.columns[0])
                 if 1 in features:
-                    text_1 = st.text_input(f"Enter {data.columns[1]}", placeholder=data.columns[1])
+                    text_1 = st.number_input(f"Enter {data.columns[1]}", placeholder=data.columns[1])
                 if 2 in features:
-                    text_2 = st.text_input(f"Enter {data.columns[2]}", placeholder=data.columns[2])
+                    text_2 = st.number_input(f"Enter {data.columns[2]}", placeholder=data.columns[2])
                 if 3 in features:
                     enter_state = st.selectbox(
                         f'Enter {data.columns[3]}',
@@ -461,8 +461,8 @@ if uploaded_file is not None:
                     if len(predict) == len(features):
                         predict_arr = np.array(predict)
                         predict_arr = np.reshape(predict_arr, (1, -1))
-                        st.write(predict_arr)
-                        st.write(type(predict_arr))
+                        print(predict_arr)
+                        print(print(type(predict_arr[0])))
                         y_pred_real = model.predict(predict_arr)
                         st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
                     else:
