@@ -75,7 +75,11 @@ if uploaded_file is not None:
 
 # ============================================ Test Feature Selection ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
-
+    st.markdown(
+            """
+                ## Test Select feature
+            """
+    )
 # ============================================ Feature Selection ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
     st.markdown(
