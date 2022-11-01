@@ -73,6 +73,9 @@ if uploaded_file is not None:
     dataset_style = dataset_style.style.background_gradient(cmap='Blues')
     st.dataframe(dataset_style, height=600, use_container_width=True)
 
+# ============================================ Test Feature Selection ============================================
+    st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+
 # ============================================ Feature Selection ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
     st.markdown(
