@@ -72,60 +72,59 @@ if uploaded_file is not None:
     dataset_style = dataset.copy()
     dataset_style = dataset_style.style.background_gradient(cmap='Blues')
     st.dataframe(dataset_style, height=600, use_container_width=True)
-
-# ============================================ Test Feature Selection ============================================
+        
+# ============================================ Feature Selection Train ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
     st.markdown(
             """
-                ## Test Select features
+                ## Select features training
             """
     )
-# ============================================ Feature Selection ============================================
+    
+    data_columns = data.columns.values.tolist()
+    data_features_train = [False for _ in range(len(data.columns.values.tolist()))]
+    
+    features_train = []
+    for i in range(0, len(data_columns)):
+        col1, col2 = st.columns([1, 19])
+        with col1: checkbox_feature = st.checkbox("", key=i)
+        with col2: 
+            if checkbox_feature:
+                st.markdown(styles.selected_style_checked(data_columns[i]), unsafe_allow_html=True)
+                features_train.append(i)
+                data_features_train[i] = True
+            else: 
+                st.markdown(styles.selected_style_unchecked(data_columns[i]), unsafe_allow_html=True)
+                data_features_train[i] = False
+
+# ============================================ Feature Selection Test ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
     st.markdown(
-        """
-            ## Select feature
-        """
+            """
+                ## Select features predict
+            """
     )
-
-    features = []
-    col1, col2 = st.columns([1, 19])
-    with col1: feature_1 = st.checkbox("", key=1)
-    with col2: 
-        if feature_1: 
-            st.markdown(styles.selected_style_checked("R&D Spend"), unsafe_allow_html=True)
-            features.append(0)
-        else: st.markdown(styles.selected_style_unchecked("R&D Spend"), unsafe_allow_html=True)
-
-    col1, col2 = st.columns([1, 19])
-    with col1: feature_2 = st.checkbox("", key=2)
-    with col2: 
-        if feature_2: 
-            st.markdown(styles.selected_style_checked("Administration"), unsafe_allow_html=True)
-            features.append(1)
-        else: st.markdown(styles.selected_style_unchecked("Administration"), unsafe_allow_html=True)
-
-    col1, col2 = st.columns([1, 19])
-    with col1: feature_3 = st.checkbox("", key=3)
-    with col2: 
-        if feature_3: 
-            st.markdown(styles.selected_style_checked("Marketing Spend"), unsafe_allow_html=True)
-            features.append(2)
-        else: st.markdown(styles.selected_style_unchecked("Marketing Spend"), unsafe_allow_html=True)
-
-    col1, col2 = st.columns([1, 19])
-    with col1: feature_4 = st.checkbox("", key=4)
-    with col2: 
-        if feature_4: 
-            st.markdown(styles.selected_style_checked("State"), unsafe_allow_html=True)
-            features.append(3)
-        else: st.markdown(styles.selected_style_unchecked("State"), unsafe_allow_html=True)
+    data_features_label = []
+    
+    for i in range(len(data.columns.values.tolist())):
+        if data_features_train[i] == False:
+            data_features_label.append(data_columns[i])
+            
+    features_label = None
+    
+    checkbox_label = st.radio(
+        "",
+        tuple(data_features_label)
+    )
+    if checkbox_label in data_features_label:
+        features_label = data_columns.index(checkbox_label)
+            
 
     # =============== Get train and test data ==============
     st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
     
-    train_features = data.iloc[:, features]
-    test_label = data.iloc[:, -1].to_frame()
+    train_features = data.iloc[:, features_train]
+    test_label = data.iloc[:, features_label].to_frame()
     col1, col2, col3 = st.columns([7, 1, 2])
     with col1:
         col1.markdown(
@@ -199,7 +198,7 @@ if uploaded_file is not None:
 
     # ============================================ Data preprocessing ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
-    if len(features) == 0:
+    if len(features_train) == 0:
         st.text('No features is selected')
     else:
         st.markdown(
@@ -211,11 +210,12 @@ if uploaded_file is not None:
         st.text("For label encoding, we need to import LabelEncoder as shown below. Then we create an object of this class that is used to call fit_transform() method to encode the state column of the given datasets.")
         flag_encoder = False
         
-        if 3 in features:
-            lb = LabelEncoder()
-            data['State'] = data['State'].astype('category').cat.codes
-            st.dataframe(data.iloc[:, features].style.background_gradient(cmap='Purples'), use_container_width=True)
-            flag_encoder = True
+        for col in data_columns:
+            if data_columns.index(col) in features_train and data[col].dtype == 'object':
+                lb = LabelEncoder()
+                data[col] = data[col].astype('category').cat.codes
+                st.dataframe(data.iloc[:, [data_columns.index(col)]].style.background_gradient(cmap='Purples'), use_container_width=True)
+                flag_encoder = True
 
         # ============================================ Model selection ============================================
         st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
@@ -225,14 +225,15 @@ if uploaded_file is not None:
             """
         )
         dt = data.to_numpy()
-        X = dt[:, features]
-        y = dt[:, -1]
+        X = dt[:, features_train]
+        y = dt[:, features_label]
         
         col1, col2 = st.columns([3, 17])
         with col1:
             button_train_test_split = st.radio(
                 "",
-                ('Train test split', 'K-Fold')
+                ('Train test split', 'K-Fold'),
+                key=100
             )
         with col2:
             if button_train_test_split == 'Train test split':
@@ -449,54 +450,33 @@ if uploaded_file is not None:
                     """
                 )
                 
-                text_0 = ''
-                text_1 = ''
-                text_2 = ''
-                
                 predict = []
-                if 0 in features:
-                    text_0 = st.text_input(f"Enter {data.columns[0]}", placeholder=data.columns[0])
-                if 1 in features:
-                    text_1 = st.text_input(f"Enter {data.columns[1]}", placeholder=data.columns[1])
-                if 2 in features:
-                    text_2 = st.text_input(f"Enter {data.columns[2]}", placeholder=data.columns[2])
-                if 3 in features:
-                    enter_state = st.selectbox(
-                        f'Enter {data.columns[3]}',
-                        ("None", "New York", "California", "Florida")
-                    )
                 
-                if 0 in features and text_0 != '':
-                    predict.append(text_0)
-                if 1 in features and text_1 != '':
-                    predict.append(text_1)
-                if 2 in features and text_2 != '':
-                    predict.append(text_2)
-                if 3 in features:
-                    if enter_state == "New York":
-                        predict.append(2)
-                    elif enter_state == "California":
-                        predict.append(0)
-                    elif enter_state == "Florida":
-                        predict.append(1)
+                col_str = False
+                for i in range(len(features_train)):
+                    if i in features_train:
+                        if data[data_columns[i]].dtype != 'object':
+                            text_input = st.text_input(f"Enter {data.columns[i]}", placeholder=data.columns[i])
+                        else:
+                            col_str = True
+                            enter_state = st.selectbox(
+                                f'Enter {data.columns[i]}',
+                                tuple(data[data.columns[i]].unique().tolist())
+                            )
+                        if data[data_columns[i]].dtype != 'object' and text_input != '':
+                            predict.append(text_input)
+                        if data[data_columns[i]].dtype == 'object':
+                            predict.append(enter_state)
+                            
                 relity_data = st.button("Run")
+                    
                 if relity_data:
-                    if len(predict) == len(features):
+                    if len(predict) == len(features_train):
                         predict_arr = np.array(predict)
                         predict_arr = np.reshape(predict_arr, (1, -1))
                         predict_arr_ = np.asarray(predict_arr, dtype=float)
-                        print(predict_arr_)
-                        print(type(predict_arr_))
-                        print(type(predict_arr_[0]))
                         y_pred_real = model.predict(predict_arr_)
-                        st.write(test_result("Profit", y_pred_real[0]), unsafe_allow_html=True)
+                        st.write(test_result(data.columns[features_label], y_pred_real[0]), unsafe_allow_html=True)
                     else:
-                        if 0 in features and text_0 == '':
-                            st.write("Enter value for R&D Spend")
-                        if 1 in features and text_1 == '':
-                            st.write("Enter value for Administration")
-                        if 2 in features and text_2 == '':
-                            st.write("Enter value for Marketing Spend")
-                        if 3 in features and enter_state == "None":
-                            st.write("Select value for State")
-
+                        st.write("Error")
+                            
