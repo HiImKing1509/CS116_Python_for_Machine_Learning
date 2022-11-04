@@ -5,6 +5,16 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from PIL import Image
 import time
+import seaborn as sns
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 from styles import styles, text_success
 
@@ -43,7 +53,7 @@ st.markdown(
 st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
 st.markdown(
     """
-        ## Load data
+        # Load data
     """
 )
 uploaded_file = st.file_uploader("Upload dataset")
@@ -59,92 +69,155 @@ if uploaded_file is not None:
     
     # ============================================ Feature Selection Train ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+    st.markdown(
+        """
+            # Select features
+        """
+    )
+    st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
+    
     
     data_columns = data.columns.values.tolist()
     data_features_train = [False for _ in range(len(data.columns.values.tolist()))]
     
-    features_train = []
-    col1, col2 = st.columns(2)
-    col1.markdown(
+    st.markdown(
             """
                 ## Select features training
             """
     )
-    
-    with col1:
-        check_feature = data_columns
-        if data_columns:
-            feature_select = []
-            for choice in st.session_state.keys():
-                if choice.startswith('dynamic_checkbox_') and st.session_state[choice]:
-                    feature_select.append(choice.replace('dynamic_checkbox_',''))
-        
+
+    check_feature = data_columns
+    if data_columns:
+        feature_select = []
+        for choice in st.session_state.keys():
+            if choice.startswith('dynamic_checkbox_') and st.session_state[choice]:
+                feature_select.append(choice.replace('dynamic_checkbox_',''))
+    col1, col2, col3 = st.columns([1, 1, 10])
+    with col1: 
         if st.button('Select All'):
             for i in data:
                 st.session_state['dynamic_checkbox_' + i] = True
             st.experimental_rerun()
-        if st.button('UnSelect All'):
+    with col2:
+        if st.button('Unselect All'):
             for i in data:
                 st.session_state['dynamic_checkbox_' + i] = False
             st.experimental_rerun()
-        
-        for i in data:
+    with col3:
+        st.write("")    
+    cols = st.columns(5)
+    index = 0
+    for i in data:
+        with cols[index % 5]:
             st.checkbox(i, key='dynamic_checkbox_' + i)
-        feature_choose = data.loc[:, feature_select]
-        feature_not_choose = data.loc[:, ~data.columns.isin(feature_select)]
-        
-    # for i in range(0, len(data_columns)):
-    #     with col1: 
-    #         checkbox_feature = st.checkbox(f"{data_columns[i]}", key=i)
-    #         if checkbox_feature:
-    #             features_train.append(i)
-    #             data_features_train[i] = True
-    #         else: 
-    #             data_features_train[i] = False
+        index += 1
+
+    features_train = data.loc[:, feature_select]
+    features_not_train = data.loc[:, ~data.columns.isin(feature_select)]
     # ============================================ Feature Selection Test ============================================
-    col2.markdown(
-            """
-                ## Select features predict
-            """
-    )
-    with col2:    
-        data_features_label = []
-        
-        for i in range(len(data.columns.values.tolist())):
-            if data_features_train[i] == False:
-                data_features_label.append(data_columns[i])
-                
-        features_label = None
-        
-        selectbox_label = st.selectbox(
-            "",
-            tuple(data_features_label)
+    st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
+    col1, col2 = st.columns([3, 7])
+    with col1:
+        col1.markdown(
+                """
+                    ## Select features predict
+                """
         )
-        if selectbox_label:
-            features_label = data_columns.index(selectbox_label)
-    
-    
+        
+        selectbox_label = st.radio(
+            "",
+            tuple(features_not_train)
+        )
+        features_label = selectbox_label
+    with col2:
+        col2.markdown(
+            """
+                ## Data counts and statistics
+            """
+        )
+        if selectbox_label != None:
+            df1 = data[selectbox_label].value_counts()
+            st.bar_chart(df1, use_container_width=True)
+            st.dataframe(data.loc[:, features_label].to_frame().style.background_gradient(cmap='bone'), use_container_width=True)
     
     # ============================================ Train model ============================================
-    if len(features_train) != 0 and features_label != None:
-        # =============== Get train and test data ==============
-        st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
+    st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+    if selectbox_label != None:
+        st.markdown(
+            """
+                # One-hot Encoder
+            """
+        )
         
-        train_features = data.iloc[:, features_train]
-        test_label = data.iloc[:, features_label].to_frame()
-        col1, col2, col3 = st.columns([7, 1, 2])
+        if data[selectbox_label].dtypes == 'object':   
+            lb = LabelEncoder()
+            data[selectbox_label] = data[selectbox_label].astype('category').cat.codes
+                    
+        feature_select = [feature for feature in feature_select if len(data[feature].unique()) <= len(data) * 0.75]
+        data = data.loc[:, feature_select + [features_label]]
+        feature_select_obj = [feature for feature in feature_select if data[feature].dtypes == 'object']
+        f_data = pd.get_dummies(
+            data = data,
+            columns = feature_select_obj,
+            prefix = "f"
+        )
+        
+        # Get X, y
+        X = f_data[f_data.columns.difference([selectbox_label])].to_numpy()
+        y = f_data[selectbox_label].to_numpy()
+    
+    # ============================================ Model selection ============================================
+        st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+        st.markdown(
+            """
+                # Model selection
+            """
+        )
+        
+        col1, col2, col3 = st.columns([3, 1, 6])
         with col1:
-            col1.markdown(
-                    """
-                        ### Data train
-                    """, unsafe_allow_html=True)
-            col1.dataframe(train_features, use_container_width=True)
-        with col2: st.write(' ')
+            button_train_test_split = st.selectbox(
+                "",
+                ('Train test split', 'K-Fold'),
+                key=100
+            )
+        with col2:
+            st.write("")
         with col3:
-            col3.markdown(
-                    """
-                        ### Data test
-                    """, unsafe_allow_html=True)
-            col3.dataframe(test_label, use_container_width=True)
-            
+            if button_train_test_split == 'Train test split':
+                slider_train_test_split = st.slider('Training rate', 0.0, 0.99, 0.8)
+                st.markdown(f"Train size accounts for {slider_train_test_split * 100}% dataset")
+                input_random_state = st.number_input('Random state', min_value=0)
+                st.markdown(f"Random state equal {input_random_state}")
+                X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=slider_train_test_split, random_state=input_random_state)
+            else:
+                split_value = st.number_input("", min_value=2)
+                st.write('You selected:', split_value)
         
+        # ============================================ Model ============================================
+        st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+        st.markdown(
+            """
+                # Model
+            """
+        )
+        st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
+        button_train = st.button("Run")
+        if button_train:
+            y_train = y_train.reshape(-1)
+            y_test = y_test.reshape(-1)
+            
+            sc = StandardScaler()
+            X_train = sc.fit_transform(X_train)
+            X_test = sc.transform(X_test)
+            
+            model = LogisticRegression()
+            hist = model.fit(X_train, y_train)
+            
+            y_pred = model.predict(X_test)
+            
+            print(y_pred)
+            print(y_test)
+            
+            st.write(accuracy_score(y_pred, y_test))
+            

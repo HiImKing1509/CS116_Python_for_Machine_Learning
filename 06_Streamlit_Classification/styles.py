@@ -1,6 +1,3 @@
-from unicodedata import name
-
-
 class styles: 
 	# Custom separate lines
 	lines_separate_style = """ 

@@ -12,21 +12,14 @@ from matplotlib.colors import ListedColormap
 # Read data
 data = pd.read_csv("./datasets/Social_Network_Ads.csv")
 
-# Check columns
-print(data.columns.values.tolist())
-
 # Get train & test data
 X = data.iloc[:, [0, 1]].to_numpy()
 y = data.iloc[:, [2]].to_numpy()
 
 # Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, )
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=15)
 y_train = y_train.reshape(-1)
 y_test = y_test.reshape(-1)
-print(X_train.shape)
-print(X_test.shape)
-print(y_train.shape)
-print(y_test.shape)
 
 # Data normalization
 sc = StandardScaler()
