@@ -148,10 +148,16 @@ if uploaded_file is not None:
             """
         )
         
-        st.write(dict(zip(data[selectbox_label].cat.codes, data[selectbox_label])))
-        if data[selectbox_label].dtypes == 'object':   
-            data[selectbox_label] = data[selectbox_label].astype('category').cat.codes
-            
+        flag_label_is_obj = False
+        
+        # if data[selectbox_label].dtypes == 'object':
+        #     flag_label_is_obj = True
+        #     y_original = data[selectbox_label].copy()
+        #     data[selectbox_label] = data[selectbox_label].astype('category').cat.codes
+        #     mapping_label = {}
+        #     for i in range (0, len(y_original)):
+        #         mapping_label.update({data[selectbox_label][i].tolist() : y_original[i]})
+        
         feature_select = [feature for feature in feature_select if len(data[feature].unique()) <= len(data) * 0.75]
         data = data.loc[:, feature_select + [features_label]]
         feature_select_obj = [feature for feature in feature_select if data[feature].dtypes == 'object']
@@ -162,8 +168,13 @@ if uploaded_file is not None:
         )
         
         # Get X, y
+        
+        XX = f_data[f_data.columns.difference([selectbox_label])]
+        yy = f_data[selectbox_label]
+        
         X = f_data[f_data.columns.difference([selectbox_label])].to_numpy()
         y = f_data[selectbox_label].to_numpy()
+            
     
     # ============================================ Model selection ============================================
         st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
@@ -235,5 +246,54 @@ if uploaded_file is not None:
         with col2:
             st.write("")
         with col3:
-            pred_df = pd.DataFrame({'Actual Value': y_test,'Predicted Value': y_pred,'Difference': y_test != y_pred})
-            st.dataframe(pred_df, use_container_width=True)
+            if button_train:
+                pred_df = pd.DataFrame({'Actual Value': y_test, 'Predicted Value': y_pred, 'Same': y_test == y_pred})
+                # if flag_label_is_obj == True:
+                #     for i in range(0, len(y_pred)):
+                #         pred_df["Actual Value"][i] = mapping_label[i] 
+                #         pred_df["Predicted Value"][i] = mapping_label[i]
+                st.dataframe(pred_df, use_container_width=True)
+                count = [pred_df["Actual Value"][i] == pred_df["Predicted Value"][i] for i in range(0, len(pred_df))].count(True)
+                st.markdown(
+                        f"""
+                            ### {count} / {len(pred_df)} samples are predicted exactly
+                        """
+                )
+        
+        st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+        st.markdown(
+            """
+                ## Test on real data
+            """
+        )
+        
+        print(features_train.columns)
+        
+        feature_real = []
+        
+        col_str = False
+        for i in features_train.columns:
+            if i.dtype != 'object':
+                text_input = st.text_input(f"Enter {i}", placeholder=i)
+            else:
+                col_str = True
+                enter_state = st.selectbox(
+                    f'Enter {i}',
+                    tuple(i.unique().tolist())
+                )
+            if i.dtype != 'object' and text_input != '':
+                feature_real.append(text_input)
+            if i.dtype == 'object':
+                feature_real.append(enter_state)
+                    
+        relity_data = st.button("Run", key=1)
+            
+        # if relity_data:
+        #     if len(feature_real) == len(features_train):
+        #         predict_arr = np.array(feature_real)
+        #         predict_arr = np.reshape(predict_arr, (1, -1))
+        #         predict_arr_ = np.asarray(predict_arr, dtype=float)
+        #         y_pred_real = model.predict(predict_arr_)
+        #         st.write(data.columns[features_label], y_pred_real[0], unsafe_allow_html=True)
+        #     else:
+        #         st.write("Error")
