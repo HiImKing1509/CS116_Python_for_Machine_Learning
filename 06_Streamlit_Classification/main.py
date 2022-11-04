@@ -12,7 +12,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
@@ -149,10 +148,10 @@ if uploaded_file is not None:
             """
         )
         
+        st.write(dict(zip(data[selectbox_label].cat.codes, data[selectbox_label])))
         if data[selectbox_label].dtypes == 'object':   
-            lb = LabelEncoder()
             data[selectbox_label] = data[selectbox_label].astype('category').cat.codes
-                    
+            
         feature_select = [feature for feature in feature_select if len(data[feature].unique()) <= len(data) * 0.75]
         data = data.loc[:, feature_select + [features_label]]
         feature_select_obj = [feature for feature in feature_select if data[feature].dtypes == 'object']
@@ -202,22 +201,39 @@ if uploaded_file is not None:
             """
         )
         st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
-        button_train = st.button("Run")
-        if button_train:
-            y_train = y_train.reshape(-1)
-            y_test = y_test.reshape(-1)
-            
-            sc = StandardScaler()
-            X_train = sc.fit_transform(X_train)
-            X_test = sc.transform(X_test)
-            
-            model = LogisticRegression()
-            hist = model.fit(X_train, y_train)
-            
-            y_pred = model.predict(X_test)
-            
-            print(y_pred)
-            print(y_test)
-            
-            st.write(accuracy_score(y_pred, y_test))
-            
+        col1, col2, col3 = st.columns([4, 1, 5])
+        with col1:
+            option_model = st.selectbox(
+                'How would you like to be selected?',
+                ('Logistic Regression', 'Decision Tree Classifier', 'KNeighbors Classifier', 'GaussianNB', 'Random Forest Classifier')
+            )
+                    
+            button_train = st.button("Run")
+            if button_train:
+                y_train = y_train.reshape(-1)
+                y_test = y_test.reshape(-1)
+                
+                sc = StandardScaler()
+                X_train = sc.fit_transform(X_train)
+                X_test = sc.transform(X_test)
+                
+                model = None
+                if option_model == 'Logistic Regression':
+                    model = LogisticRegression()
+                elif option_model == 'Decision Tree Classifier':
+                    model = DecisionTreeClassifier()
+                elif option_model == 'KNeighbors Classifier':
+                    model = KNeighborsClassifier()
+                elif option_model == 'GaussianNB':
+                    model = GaussianNB()
+                else:
+                    model = RandomForestClassifier()
+                hist = model.fit(X_train, y_train)
+                y_pred = model.predict(X_test)
+                
+                st.text_input(label="", value=accuracy_score(y_pred, y_test))
+        with col2:
+            st.write("")
+        with col3:
+            pred_df = pd.DataFrame({'Actual Value': y_test,'Predicted Value': y_pred,'Difference': y_test != y_pred})
+            st.dataframe(pred_df, use_container_width=True)
