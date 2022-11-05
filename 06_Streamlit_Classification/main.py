@@ -18,22 +18,9 @@ from sklearn.metrics import accuracy_score
 from styles import styles, text_success
 
 # ===== function =====
-def checkbox_container(data):
-    cols = st.columns(5)
-    if cols[0].button('Select All'):
-        for i in data:
-            st.session_state['dynamic_checkbox_' + i] = True
-        st.experimental_rerun()
-    if cols[1].button('UnSelect All'):
-        for i in data:
-            st.session_state['dynamic_checkbox_' + i] = False
-        st.experimental_rerun()
-    data_cols = st.columns(len(data))
-    index = 0
-    for i in data:
-        with data_cols[index % 5]:
-            st.checkbox(i, key='dynamic_checkbox_' + i)
-            index += 1
+def reset_session_state():
+    st.session_state['trained'] = False 
+    return
 
 # ======================================================================================== Application
 
@@ -47,6 +34,13 @@ st.markdown(
         # ID: 20521494
     """
 )
+
+# session_state
+if 'trained' not in st.session_state:
+    st.session_state['trained'] = False
+    st.session_state['model'] = None
+    # st.session_state['score'] = [0, 0]
+    # st.session_state['cfs_matrix'] = None
 
 # ============================================ Load data ============================================
 st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
@@ -63,6 +57,7 @@ if uploaded_file is not None:
     img_path = './' + uploaded_file.name
     # =============== Read data ==============
     data = pd.read_csv(uploaded_file)
+    data_ = data.copy()
     st.markdown(text_success(uploaded_file.name), unsafe_allow_html=True)
     st.dataframe(data, height=600, use_container_width=True)
     
@@ -103,16 +98,20 @@ if uploaded_file is not None:
                 st.session_state['dynamic_checkbox_' + i] = False
             st.experimental_rerun()
     with col3:
-        st.write("")    
+        st.write("")
     cols = st.columns(5)
     index = 0
     for i in data:
         with cols[index % 5]:
-            st.checkbox(i, key='dynamic_checkbox_' + i)
+            st.checkbox(i, key='dynamic_checkbox_' + i, on_change=reset_session_state)
         index += 1
-
+         
     features_train = data.loc[:, feature_select]
     features_not_train = data.loc[:, ~data.columns.isin(feature_select)]
+
+    if len(feature_select) == 0:
+        st.info("Select features to continue")
+        st.stop()
     # ============================================ Feature Selection Test ============================================
     st.markdown(styles.lines_separate_style, unsafe_allow_html=True)
     col1, col2 = st.columns([3, 7])
@@ -125,7 +124,8 @@ if uploaded_file is not None:
         
         selectbox_label = st.radio(
             "",
-            tuple(features_not_train)
+            tuple(features_not_train),
+            on_change=reset_session_state
         )
         features_label = selectbox_label
     with col2:
@@ -138,7 +138,7 @@ if uploaded_file is not None:
             df1 = data[selectbox_label].value_counts()
             st.bar_chart(df1, use_container_width=True)
             st.dataframe(data.loc[:, features_label].to_frame().style.background_gradient(cmap='bone'), use_container_width=True)
-    
+            
     # ============================================ Train model ============================================
     st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
     if selectbox_label != None:
@@ -158,7 +158,7 @@ if uploaded_file is not None:
         #     for i in range (0, len(y_original)):
         #         mapping_label.update({data[selectbox_label][i].tolist() : y_original[i]})
         
-        feature_select = [feature for feature in feature_select if len(data[feature].unique()) <= len(data) * 0.75]
+        # feature_select = [feature for feature in feature_select if len(data[feature].unique()) <= len(data) * 0.75]
         data = data.loc[:, feature_select + [features_label]]
         feature_select_obj = [feature for feature in feature_select if data[feature].dtypes == 'object']
         f_data = pd.get_dummies(
@@ -189,13 +189,13 @@ if uploaded_file is not None:
             button_train_test_split = st.selectbox(
                 "",
                 ('Train test split', 'K-Fold'),
-                key=100
+                on_change=reset_session_state
             )
         with col2:
             st.write("")
         with col3:
             if button_train_test_split == 'Train test split':
-                slider_train_test_split = st.slider('Training rate', 0.0, 0.99, 0.8)
+                slider_train_test_split = st.slider('Training rate', 0.0, 0.99, 0.8, on_change=reset_session_state)
                 st.markdown(f"Train size accounts for {slider_train_test_split * 100}% dataset")
                 input_random_state = st.number_input('Random state', min_value=0)
                 st.markdown(f"Random state equal {input_random_state}")
@@ -203,7 +203,7 @@ if uploaded_file is not None:
             else:
                 split_value = st.number_input("", min_value=2)
                 st.write('You selected:', split_value)
-        
+                
         # ============================================ Model ============================================
         st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
         st.markdown(
@@ -219,8 +219,9 @@ if uploaded_file is not None:
                 ('Logistic Regression', 'Decision Tree Classifier', 'KNeighbors Classifier', 'GaussianNB', 'Random Forest Classifier')
             )
                     
-            button_train = st.button("Run")
-            if button_train:
+            model = None
+            if st.button("Run"):
+                st.session_state['trained'] = True
                 y_train = y_train.reshape(-1)
                 y_test = y_test.reshape(-1)
                 
@@ -228,7 +229,6 @@ if uploaded_file is not None:
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.transform(X_test)
                 
-                model = None
                 if option_model == 'Logistic Regression':
                     model = LogisticRegression()
                 elif option_model == 'Decision Tree Classifier':
@@ -242,58 +242,71 @@ if uploaded_file is not None:
                 hist = model.fit(X_train, y_train)
                 y_pred = model.predict(X_test)
                 
+                st.session_state['model'] = model
+                
                 st.text_input(label="", value=accuracy_score(y_pred, y_test))
+                with col3:
+                    pred_df = pd.DataFrame({'Actual Value': y_test, 'Predicted Value': y_pred, 'Same': y_test == y_pred})
+                    # if flag_label_is_obj == True:
+                    #     for i in range(0, len(y_pred)):
+                    #         pred_df["Actual Value"][i] = mapping_label[i] 
+                    #         pred_df["Predicted Value"][i] = mapping_label[i]
+                    st.dataframe(pred_df, use_container_width=True)
+                    count = [pred_df["Actual Value"][i] == pred_df["Predicted Value"][i] for i in range(0, len(pred_df))].count(True)
+                    st.markdown(
+                            f"""
+                                ### {count} / {len(pred_df)} samples are predicted exactly
+                            """
+                    )
+        if not st.session_state['trained']:
+            st.info("Train model to continue")
+            st.stop()
         with col2:
             st.write("")
-        with col3:
-            if button_train:
-                pred_df = pd.DataFrame({'Actual Value': y_test, 'Predicted Value': y_pred, 'Same': y_test == y_pred})
-                # if flag_label_is_obj == True:
-                #     for i in range(0, len(y_pred)):
-                #         pred_df["Actual Value"][i] = mapping_label[i] 
-                #         pred_df["Predicted Value"][i] = mapping_label[i]
-                st.dataframe(pred_df, use_container_width=True)
-                count = [pred_df["Actual Value"][i] == pred_df["Predicted Value"][i] for i in range(0, len(pred_df))].count(True)
-                st.markdown(
-                        f"""
-                            ### {count} / {len(pred_df)} samples are predicted exactly
-                        """
-                )
-        
+        # ============================================ Test on real data ============================================
         st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
         st.markdown(
             """
                 ## Test on real data
             """
         )
-        
-        print(features_train.columns)
-        
+              
         feature_real = []
         
-        col_str = False
+        cols = st.columns(3)
+        
+        index = 0
         for i in features_train.columns:
-            if i.dtype != 'object':
-                text_input = st.text_input(f"Enter {i}", placeholder=i)
-            else:
-                col_str = True
-                enter_state = st.selectbox(
-                    f'Enter {i}',
-                    tuple(i.unique().tolist())
-                )
-            if i.dtype != 'object' and text_input != '':
-                feature_real.append(text_input)
-            if i.dtype == 'object':
-                feature_real.append(enter_state)
-                    
-        relity_data = st.button("Run", key=1)
+            with cols[index % 3]:
+                if data_[i].dtype == 'object':
+                    enter_state = st.selectbox(
+                        f'Enter {i}',
+                        tuple(data_[i].unique().tolist())
+                    )
+                elif data_[i].dtype == 'int64':
+                    text_input = st.number_input(f"Enter {i}", min_value=0)
+                else:
+                    text_input = st.text_input(f"Enter {i}", placeholder=i)
             
-        # if relity_data:
-        #     if len(feature_real) == len(features_train):
-        #         predict_arr = np.array(feature_real)
-        #         predict_arr = np.reshape(predict_arr, (1, -1))
-        #         predict_arr_ = np.asarray(predict_arr, dtype=float)
-        #         y_pred_real = model.predict(predict_arr_)
-        #         st.write(data.columns[features_label], y_pred_real[0], unsafe_allow_html=True)
-        #     else:
-        #         st.write("Error")
+                if data_[i].dtype != 'object' and text_input != '':
+                    feature_real.append(text_input)
+                if data_[i].dtype == 'object':
+                    
+                    feature_real.append(enter_state)
+            index += 1
+                                
+        if st.button("Make Predict"):
+            # if len(feature_real) == len(features_train.columns):
+                try:
+                    model = st.session_state['model']    
+                    predict_arr = np.array(feature_real)
+                    predict_arr = np.reshape(predict_arr, (1, -1))
+                    predict_arr_ = np.asarray(predict_arr, dtype=float)
+                    y_pred_real = model.predict(predict_arr)
+                    st.write(y_pred_real[0], unsafe_allow_html=True)
+                except Exception as e:
+                    st.write(e)
+            # else:   
+                # st.info("Error")
+        else:
+            st.info("Error!!!")
