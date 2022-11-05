@@ -24,7 +24,7 @@
 
 ## INSTRUCTORS
 <a name="giangvien"></a>
-* TS. **Nguyễn Vinh Tiệp** - *tiepnv@uit.edu.vn*
+* PhD. **Nguyễn Vinh Tiệp** - *tiepnv@uit.edu.vn*
 
 ## MEMBERS
 <a name="thanhvien"></a>
