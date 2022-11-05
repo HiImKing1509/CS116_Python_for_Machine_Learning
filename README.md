@@ -38,7 +38,7 @@
 * <a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/03_Plotting_polygons_with_Folium" style="border: 5; margin-left: 10;">Plotting polygons with Folium</a></br>
 * <a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/04_%20Clustering_user_click_data" style="border: 5; margin-left: 10;">Clustering user click data</a></br>
 * <a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/05_Streamlit_Linear_Regression">Streamlit app (Linear Regression model)</a>
-  * <a href="https://05-streamlitstreamlit-linear-regressionstreamlit-linea-6qxg1e.streamlitapp.com/" style="border: 5; margin-left: 10;">Deploy app</a> 
+  * <a href="https://05-streamlit-linear-regressionstreamlit-linear-regress-xhim57.streamlit.app/" style="border: 5; margin-left: 10;">Deploy app</a> 
 * <a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/06_Streamlit_Classification">Streamlit app (Classification model)</a>
   * <a href="https://hiimking1509-cs116-pytho-06-streamlit-classificationmain-77j508.streamlit.app/" style="border: 5; margin-left: 10;">Deploy app</a>
 
