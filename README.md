@@ -42,7 +42,7 @@
 * <a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/06_Streamlit_Classification">Streamlit app (Classification model)</a>
   * <a href="https://hiimking1509-cs116-pytho-06-streamlit-classificationmain-77j508.streamlit.app/" style="border: 5; margin-left: 10;">Deploy app</a>
 * <a href="https://github.com/HiImKing1509/CS116_Python_for_Machine_Learning/tree/master/07_Streamlit_PCA">Streamlit app (Wine PCA)</a>
-  * <a href="" style="border: 5; margin-left: 10;">Deploy app</a>
+  * <a href="https://hiimking1509-cs116-python-for-machi-07-streamlit-pcamain-xnfzt2.streamlit.app/" style="border: 5; margin-left: 10;">Deploy app</a>
 
 ## PROJECT
 <a name="doan"></a>
