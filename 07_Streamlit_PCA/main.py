@@ -205,3 +205,20 @@ with col1:
 if not st.session_state['trained']:
     st.info("Train model to continue")
     st.stop()
+
+# ============================================ Test on real data ============================================
+st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+st.markdown(""" # Test data""")
+
+predict_data = {}
+cols = st.columns(3)
+for (index, feature) in enumerate(dataset['feature_names']):            
+    number = cols[index % 3].number_input(feature)
+    predict_data[feature] = number
+if (st.button("Predict")):
+    predict = []
+    for feature in dataset['feature_names']:
+        predict.append(predict_data[feature])
+    matrix = pca.transform(np.array([predict]))
+    res = st.session_state['model'].predict(matrix)
+    st.markdown(f""" #### Type of Customer: {res[0]}""")
