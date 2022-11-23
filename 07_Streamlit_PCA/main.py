@@ -159,8 +159,6 @@ with col1:
                 model.fit(X_train, y_train)
                 y_pred = model.predict(X_test)
                 
-                
-                
                 acc_score_all.append(accuracy_score(y_pred , y_test))                
                 ps_list.append(precision_score(y_test, y_pred, average='weighted'))
                 rs_list.append(recall_score(y_test, y_pred, average='weighted'))
@@ -190,11 +188,10 @@ with col1:
                 st.markdown("""# K Fold evaluation / number of features""")
                 list_features = [i for i in range(1, min_values(dataset))]
                 f1_score_list = k_fold_evaluation(model, X_scale, y, int(split_value), list_features)
-                
-                chart_data = pd.DataFrame(
-                    f1_score_list,
-                )
+                chart_data = pd.DataFrame(f1_score_list)
                 st.bar_chart(chart_data)
+                st.markdown(f"""### Optimal dimensionality is `{f1_score_list.index(max(f1_score_list))}`""")
+                
                                                     
             acc_score = sum(acc_score_all) / int(split_value)
             ps_mean = sum(ps_list) / int(split_value)
