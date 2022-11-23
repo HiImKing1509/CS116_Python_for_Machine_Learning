@@ -14,6 +14,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from utils import min_values
+from k_fold import k_fold_evaluation
 
 from styles import styles, text_success
 
@@ -185,6 +186,15 @@ with col1:
                                 ##### F1 score: `{fs_list[i]}`\n
                             """
                         )
+                st.markdown(styles.lines_section_separate_style, unsafe_allow_html=True)
+                st.markdown("""# K Fold evaluation / number of features""")
+                list_features = [i for i in range(1, min_values(dataset))]
+                f1_score_list = k_fold_evaluation(model, X_scale, y, int(split_value), list_features)
+                
+                chart_data = pd.DataFrame(
+                    f1_score_list,
+                )
+                st.bar_chart(chart_data)
                                                     
             acc_score = sum(acc_score_all) / int(split_value)
             ps_mean = sum(ps_list) / int(split_value)
